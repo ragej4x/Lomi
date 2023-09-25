@@ -43,7 +43,13 @@ while True:
 	main.lomi.player(display, pg)
 	main.lomi.movement(keyinput, pg)
 	main.lomi.camera(display, pg)
+
+	#ANIMATION
+	main.lomi.updateAnimation(display, keyinput, pg)
+
 	main.Map.update(display, pg)
+
+
 
 	#move
 	main.lomi.x += main.lomi.xVel
