@@ -1,14 +1,18 @@
 import pygame as pg
 import MainClass as main
+import _thread
 
-
-dynamicScale = 2
+pg.init()
+dynamicScale = 3
 width , height = 900,620
 window = pg.display.set_mode((width, height))
 display = pg.Surface((width//dynamicScale, height//dynamicScale))
 clock = pg.time.Clock()
-pg.init()
+pg.display.set_caption("LOOOOOMIIIIIIIIIIIIKOOOOOO")
 
+#MODES
+home = True
+freeRoam = False
 
 def showFps():
 	font = pg.font.SysFont("Arial", 18)
@@ -28,6 +32,43 @@ def eventHandler():
 	#RENDER TXT INTO WINDOW
 	showFps()
 
+
+
+
+def homeFunc():
+	#CALLFUNC
+	main.lomi.player(display, pg)
+	main.lomi.movement(keyinput, pg)
+	main.lomi.camera(display, pg, dynamicScale)
+
+
+	#main.home.houseBase(pg, display, mx, my, mouseinput)
+	#ANIMATION
+	
+	main.lomi.updateAnimation(display, keyinput, pg)
+
+	#move
+	main.lomi.x += main.lomi.xVel
+	main.lomi.y += main.lomi.yVel
+
+def freeRoamFunc():
+	#CALLFUNC
+	main.lomi.player(display, pg)
+	main.lomi.movement(keyinput, pg)
+	main.lomi.camera(display, pg, dynamicScale)
+
+	#ANIMATION
+	
+	main.lomi.updateAnimation(display, keyinput, pg)
+
+
+	main.Map.update(display, pg)
+
+
+	#move
+	main.lomi.x += main.lomi.xVel
+	main.lomi.y += main.lomi.yVel
+
 while True:
 	window.fill(0)
 
@@ -38,24 +79,20 @@ while True:
 	mouseinput = pg.mouse.get_pressed()
 	keyinput = pg.key.get_pressed()
 	#
+	if freeRoam == True:
+		freeRoamFunc()
+	
+	if home == True:
+		homeFunc()
 
-	#CALLFUNC
-	main.lomi.player(display, pg)
-	main.lomi.movement(keyinput, pg)
-	main.lomi.camera(display, pg)
+	
+	main.edit.draw_grid(pg , display)
+	main.edit.update(pg, mx, my, mouseinput, keyinput)
 
-	#ANIMATION
-	main.lomi.updateAnimation(display, keyinput, pg)
-
-	main.Map.update(display, pg)
-
-
-
-	#move
-	main.lomi.x += main.lomi.xVel
-	main.lomi.y += main.lomi.yVel
 
 	eventHandler()
+
+
 	pg.display.flip()
 	clock.tick(60)
 

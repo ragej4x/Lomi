@@ -1,8 +1,8 @@
-import csv
 import math
+import csv
 
 class MainClass():
-	def __init__(self, x , y):
+	def __init__(self, x , y,):
 		self.x = x
 		self.y = y
 
@@ -21,8 +21,8 @@ class MainClass():
 		#CAMERA
 
 		self.cameraSpeed = 1.5
-		self.cameraX = self.x - 900/3
-		self.cameraY = self.y - 620/3
+		self.cameraX = self.x - 125
+		self.cameraY = self.y - 110
 
 	def player(self, display, pg):
 		self.lomiRect = pg.Rect(self.x - self.cameraX , self.y - self.cameraY, 16,16)
@@ -84,21 +84,17 @@ class MainClass():
 			self.speed = 2
 
 
-
-		print(self.yVel, self.xVel)
+		#print(self.yVel, self.xVel)
 			
-
-
-	def camera(self, display, pg):
-		center = pg.draw.rect(display, (255,255,255), (900 /4 , 620/4, 4,4 ))
-		distance = math.atan2(self.y - self.cameraY - 620/4 , self.x - self.cameraX - 900/4)
+	def camera(self, display, pg, dynamicScale):
+		center = pg.draw.rect(display, (255,255,255), (900 /6, 620/6, 1,1 ))
+		distance = math.atan2(self.y - self.cameraY - 620 // 6, self.x - self.cameraX - 900 // 6)
 		self.cdx = math.cos(distance)
 		self.cdy = math.sin(distance)
 
 		if not center.colliderect(self.lomiRect):
 			self.cameraX += self.cdx * self.cameraSpeed
 			self.cameraY += self.cdy * self.cameraSpeed
-
 
 
 	def updateAnimation(self, display, keyinput, pg):
@@ -132,36 +128,50 @@ class MainClass():
 
 class MapClass():
 	def __init__(self):
-		pass
+		import pygame as pg
+		self.blockPos = []
+		self.tileSurface = pg.Surface((16,16))
+
 
 	def update(self, display, pg):
-		with open ("data/map_1.data") as file:
-			data = csv.reader(file, delimiter=',')
-
-			y = 0
-
-			for row in data:
-				x = -1
-
-				for column in range(len(row)):
-					x += 1
-
-					if row[column] == "1":
-						self.block = pg.draw.rect(display, (255,255,255), (x * 16 - lomi.cameraX , y * 16 - lomi.cameraY, 16, 16),1)
-
-						#COLLISION
-						if self.block.colliderect(lomi.lomiRect.x + lomi.xVel , lomi.lomiRect.y, lomi.lomiRect.width, lomi.lomiRect.height):
-							lomi.xVel = 0
+		self.file = open("data/map_1.data")
+		self.show_rect = True
 
 
-						if self.block.colliderect(lomi.lomiRect.x + lomi.xVel , lomi.lomiRect.y, lomi.lomiRect.width , lomi.lomiRect.height):
-							lomi.xVel = 0
+		#self.plat = pg.Surface(())
+		data = csv.reader(self.file, delimiter=',')
 
-						if self.block.colliderect(lomi.lomiRect.x, lomi.lomiRect.y + lomi.yVel, lomi.lomiRect.width , lomi.lomiRect.height):
-							lomi.yVel = 0
+		y = 0
 
-				y += 1
+		for row in data:
+			x = -1
 
+			for column in range(len(row)):
+				x += 1
+
+
+				if row[column] == "1":
+					if self.show_rect == True:
+						self.block = pg.Rect((x * 16 - lomi.cameraX , y * 16 - lomi.cameraY, 16, 16))
+						pg.draw.rect(display, (255,255,255), self.block,1)
+					
+					#COLLISION
+					if self.block.colliderect(lomi.lomiRect.x + lomi.xVel , lomi.lomiRect.y, lomi.lomiRect.width, lomi.lomiRect.height):
+						lomi.xVel = 0
+
+
+					if self.block.colliderect(lomi.lomiRect.x + lomi.xVel , lomi.lomiRect.y, lomi.lomiRect.width , lomi.lomiRect.height):
+						lomi.xVel = 0
+
+					if self.block.colliderect(lomi.lomiRect.x, lomi.lomiRect.y + lomi.yVel, lomi.lomiRect.width , lomi.lomiRect.height):
+						lomi.yVel = 0
+
+
+
+			
+		#self.tileSurface.blit()
+		#pg.draw.rect(display, (255,0,255),())
+		display.blit(self.tileSurface, (0,0))
 class AnimationClass():
 	def __init__(self, x ,y):
 		self.x = x
@@ -182,7 +192,7 @@ class AnimationClass():
 
 
 	def idleDownAnim(self, display, pg):
-		idleImage = pg.image.load(f"data/assets/anim/totoy/idD{int(self.idleDownFrame)}.anim")
+		idleImage = pg.image.load(f"data/assets/anim/totoy/idD{int(self.idleDownFrame)}.anim").convert()
 		idleImage.set_colorkey((255,0,255))
 		display.blit(idleImage, (lomi.x - lomi.cameraX , lomi.y - lomi.cameraY - 15))
 
@@ -191,7 +201,7 @@ class AnimationClass():
 			self.idleDownFrame = 1
 	
 	def idleUpAnim(self, display, pg):
-		idleImage = pg.image.load(f"data/assets/anim/totoy/idU{int(self.idleUpFrame)}.anim")
+		idleImage = pg.image.load(f"data/assets/anim/totoy/idU{int(self.idleUpFrame)}.anim").convert()
 		idleImage.set_colorkey((255,0,255))
 		display.blit(idleImage, (lomi.x - lomi.cameraX , lomi.y - lomi.cameraY - 15))
 
@@ -200,7 +210,7 @@ class AnimationClass():
 			self.idleUpFrame = 1
 
 	def idleLeftAnim(self, display, pg):
-		idleImage = pg.image.load(f"data/assets/anim/totoy/id{int(self.idleLeftFrame)}.anim")
+		idleImage = pg.image.load(f"data/assets/anim/totoy/id{int(self.idleLeftFrame)}.anim").convert()
 		leftImage = pg.transform.flip(idleImage, True, False)
 		leftImage.set_colorkey((255,0,255))
 		display.blit(leftImage, (lomi.x - lomi.cameraX , lomi.y - lomi.cameraY - 15))
@@ -211,7 +221,7 @@ class AnimationClass():
 
 	def idleRightAnim(self, display, pg):
 
-		idleImage = pg.image.load(f"data/assets/anim/totoy/id{int(self.idleRightFrame)}.anim")
+		idleImage = pg.image.load(f"data/assets/anim/totoy/id{int(self.idleRightFrame)}.anim").convert()
 		idleImage.set_colorkey((255,0,255))
 		display.blit(idleImage, (lomi.x - lomi.cameraX , lomi.y - lomi.cameraY - 15))
 
@@ -222,7 +232,7 @@ class AnimationClass():
 	#RUN
 
 	def runDownAnim(self, display, pg):
-		runImage = pg.image.load(f"data/assets/anim/totoy/rD{int(self.runDownFrame)}.anim")
+		runImage = pg.image.load(f"data/assets/anim/totoy/rD{int(self.runDownFrame)}.anim").convert()
 		runImage.set_colorkey((255,0,255))
 		display.blit(runImage, (lomi.x - lomi.cameraX , lomi.y - lomi.cameraY - 15))
 
@@ -231,7 +241,7 @@ class AnimationClass():
 			self.runDownFrame = 1
 	
 	def runUpAnim(self, display, pg):
-		runImage = pg.image.load(f"data/assets/anim/totoy/rU{int(self.runUpFrame)}.anim")
+		runImage = pg.image.load(f"data/assets/anim/totoy/rU{int(self.runUpFrame)}.anim").convert()
 		runImage.set_colorkey((255,0,255))
 		display.blit(runImage, (lomi.x - lomi.cameraX , lomi.y - lomi.cameraY - 15))
 
@@ -240,7 +250,7 @@ class AnimationClass():
 			self.runUpFrame = 1
 
 	def runLeftAnim(self, display, pg):
-		runImage = pg.image.load(f"data/assets/anim/totoy/r{int(self.runLeftFrame)}.anim")
+		runImage = pg.image.load(f"data/assets/anim/totoy/r{int(self.runLeftFrame)}.anim").convert()
 		runImage = pg.transform.flip(runImage, True, False)
 		runImage.set_colorkey((255,0,255))
 		display.blit(runImage, (lomi.x - lomi.cameraX , lomi.y - lomi.cameraY - 15))
@@ -251,7 +261,7 @@ class AnimationClass():
 
 	def runRightAnim(self, display, pg):
 
-		runImage = pg.image.load(f"data/assets/anim/totoy/r{int(self.runRightFrame)}.anim")
+		runImage = pg.image.load(f"data/assets/anim/totoy/r{int(self.runRightFrame)}.anim").convert()
 		runImage.set_colorkey((255,0,255))
 		display.blit(runImage, (lomi.x - lomi.cameraX , lomi.y - lomi.cameraY - 15))
 
@@ -259,9 +269,85 @@ class AnimationClass():
 		if self.runRightFrame > 6:
 			self.runRightFrame = 1
 
-	
 
 lomi = MainClass(0,0)
 Map = MapClass()
 anim = AnimationClass(lomi.x, lomi.y)
 
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+class homeClass():
+	def __init__(self):
+		self.tile_list = [] 
+
+
+	def houseBase(self, pg, display, mx, my, mouseinput):
+
+		if mouseinput[0]:
+			self.tile_list.append([pg.Rect((mx , my , 16 , 16))])
+			self.block = pg.draw.rect(display, (255,255,255), self.tile_list[0])
+
+
+	def update(self, mx , my, mouseinput):
+		pass
+		
+
+home = homeClass()
+
+
+class editMode():
+	def __init__(self):
+		self.world_data = []
+		self.max_col = 150
+		self.rows = 16
+		self.height = 900//3
+		self.width = 620//3
+		self.tile_size = self.height // self.rows
+		self.tile = 0
+
+		for row in range(self.rows):
+			r = [-1] * self.max_col
+			self.world_data.append(r)
+
+		print(self.world_data)
+
+	def draw_tile(self, pg, display):
+		for y, row in enumerate(self.world_data):
+			for x, tile in enumerate(row):
+				if tile >= 0:	
+					pg.draw.rect(display, (255,2,2), (x * self.tile_size - lomi.cameraX , y * self.tile_size - lomi.cameraY))
+
+
+
+	def draw_grid(self, pg, display):
+		#vertical lines
+		for c in range(self.max_col + 1):
+			pg.draw.line(display, (255,255,255), (c * self.tile_size - lomi.cameraX, 0 - lomi.cameraY), (c * self.tile_size - lomi.cameraX, self.height - lomi.cameraY))
+		#horizontal lines
+		for c in range(self.rows + 1):
+			pg.draw.line(display, (255,255,255), (0 - lomi.cameraX, c * self.tile_size - lomi.cameraY), (self.width - lomi.cameraX, c * self.tile_size - lomi.cameraY))
+
+
+	def update(self, pg, mx, my, mouseinput, keyinput):
+		#CHECK COORD
+		x = (mx + lomi.cameraX) // self.tile_size
+		y = my // self.tile_size
+
+		if mx < self.width and my < self.height:
+			if mouseinput[0]:
+				if self.world_data[y][x] != self.tile:
+					self.world_data[y][x] = self.tile
+			if mouseinput[1]:
+				self.world_data = 0
+
+
+		#SAVE DATA
+
+		if keyinput[pg.K_p]:
+			with open("data/assets/map_1.data", "w", newline="") as file:
+				writer = csv.writer(file, delimiter = ",")
+				for row in self.world_data:
+					writer.writerow(row)
+edit = editMode()
