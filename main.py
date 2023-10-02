@@ -1,6 +1,6 @@
 import pygame as pg
 import MainClass as main
-import _thread
+import editor
 
 pg.init()
 dynamicScale = 3
@@ -11,9 +11,9 @@ clock = pg.time.Clock()
 pg.display.set_caption("LOOOOOMIIIIIIIIIIIIKOOOOOO")
 
 #MODES
-home = True
+home = False
 freeRoam = False
-
+editMode = True 
 def showFps():
 	font = pg.font.SysFont("Arial", 18)
 	getFps = str(int(clock.get_fps()))
@@ -27,12 +27,22 @@ def eventHandler():
 			exit()
 			
 	dynamicResolution = pg.transform.scale(display, (width, height))
-	window.blit(dynamicResolution, (0,0))
+	#//
+	if editMode == False:
+		window.blit(dynamicpResolution, (0,0))
 
 	#RENDER TXT INTO WINDOW
 	showFps()
 
+	renderIn_noDynamicScale()
 
+def renderIn_noDynamicScale():
+
+	#NO DYNAMIC RES BLIT IN MAIN
+	if editMode == True:
+		editor.main.update(pg, mx,my,mouseinput,keyinput,window)
+		editor.main.draw_tile(pg, window)
+		editor.main.draw_grid(pg, window)
 
 
 def homeFunc():
@@ -85,15 +95,14 @@ while True:
 	if home == True:
 		homeFunc()
 
+
+
+
 	
-	main.edit.draw_grid(pg , display)
-	main.edit.update(pg, mx, my, mouseinput, keyinput)
-
-
 	eventHandler()
+
 
 
 	pg.display.flip()
 	clock.tick(60)
-
 
