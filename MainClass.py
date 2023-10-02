@@ -100,7 +100,6 @@ class MainClass():
 	def updateAnimation(self, display, keyinput, pg):
 
 
-
 		if keyinput[pg.K_w] and self.up == True:
 			anim.runUpAnim(display, pg)
 		elif not keyinput[pg.K_w] and self.up == True:
@@ -134,7 +133,7 @@ class MapClass():
 
 
 	def update(self, display, pg):
-		self.file = open("data/map_1.data")
+		self.file = open("data/assets/map_1.data")
 		self.show_rect = True
 
 
@@ -296,58 +295,3 @@ class homeClass():
 
 home = homeClass()
 
-
-class editMode():
-	def __init__(self):
-		self.world_data = []
-		self.max_col = 150
-		self.rows = 16
-		self.height = 900//3
-		self.width = 620//3
-		self.tile_size = self.height // self.rows
-		self.tile = 0
-
-		for row in range(self.rows):
-			r = [-1] * self.max_col
-			self.world_data.append(r)
-
-		print(self.world_data)
-
-	def draw_tile(self, pg, display):
-		for y, row in enumerate(self.world_data):
-			for x, tile in enumerate(row):
-				if tile >= 0:	
-					pg.draw.rect(display, (255,2,2), (x * self.tile_size - lomi.cameraX , y * self.tile_size - lomi.cameraY))
-
-
-
-	def draw_grid(self, pg, display):
-		#vertical lines
-		for c in range(self.max_col + 1):
-			pg.draw.line(display, (255,255,255), (c * self.tile_size - lomi.cameraX, 0 - lomi.cameraY), (c * self.tile_size - lomi.cameraX, self.height - lomi.cameraY))
-		#horizontal lines
-		for c in range(self.rows + 1):
-			pg.draw.line(display, (255,255,255), (0 - lomi.cameraX, c * self.tile_size - lomi.cameraY), (self.width - lomi.cameraX, c * self.tile_size - lomi.cameraY))
-
-
-	def update(self, pg, mx, my, mouseinput, keyinput):
-		#CHECK COORD
-		x = (mx + lomi.cameraX) // self.tile_size
-		y = my // self.tile_size
-
-		if mx < self.width and my < self.height:
-			if mouseinput[0]:
-				if self.world_data[y][x] != self.tile:
-					self.world_data[y][x] = self.tile
-			if mouseinput[1]:
-				self.world_data = 0
-
-
-		#SAVE DATA
-
-		if keyinput[pg.K_p]:
-			with open("data/assets/map_1.data", "w", newline="") as file:
-				writer = csv.writer(file, delimiter = ",")
-				for row in self.world_data:
-					writer.writerow(row)
-edit = editMode()
