@@ -132,24 +132,52 @@ class MapClass():
 		self.tileSurface = pg.Surface((16,16))
 
 
-	def update(self, display, pg):
-		self.file = open("data/assets/map_1.data")
+		self.world_data = []
+		self.max_col = 50
+		self.rows = 40
+		self.height = 900
+		self.width = 620
+		self.tile_size = self.height // self.rows
+		self.tile = 1
+
+
+		#LOAD IMAGE
+		self.item_list = []
+		self.item_count = 63
+		for i in range(self.item_count):
+			self.small_items = pg.image.load(f"data/assets/items/item ({i}).png")
+			#self.small_items = pg.transform.scale(self.small_items, (self.tile_size, self.tile_size))
+			self.item_list.append(self.small_items)
+
+
+		for row in range(self.rows):
+			r = [0] * self.max_col
+			self.world_data.append(r)
+
+
+		#LOAD DATA
+		with open("data/assets/map_1.data", newline='') as data:
+			reader = csv.reader(data, delimiter = ",")
+			for x, row in enumerate(reader):
+				for y, tile in enumerate(row):
+					self.world_data[x][y] = int(tile)
+	
+
+	def update(self, display, pg, keyinput):
+
 		self.show_rect = True
 
 
 		#self.plat = pg.Surface(())
-		data = csv.reader(self.file, delimiter=',')
 
-		y = 0
-
-		for row in data:
-			x = -1
-
-			for column in range(len(row)):
-				x += 1
+		for y, row in enumerate(self.world_data):
+			for x, tile in enumerate(row):
+				if tile >= 1:
+					display.blit(self.item_list[tile], (x * 16 - lomi.cameraX, y * 16 - lomi.cameraY))
+					#display.blit(self.small_items_surface, (x * self.tile_size	,y * self.tile_size))
 
 
-				if row[column] == "1":
+				if tile == 1:
 					if self.show_rect == True:
 						self.block = pg.Rect((x * 16 - lomi.cameraX , y * 16 - lomi.cameraY, 16, 16))
 						pg.draw.rect(display, (255,255,255), self.block,1)
@@ -166,11 +194,6 @@ class MapClass():
 						lomi.yVel = 0
 
 
-
-			
-		#self.tileSurface.blit()
-		#pg.draw.rect(display, (255,0,255),())
-		display.blit(self.tileSurface, (0,0))
 class AnimationClass():
 	def __init__(self, x ,y):
 		self.x = x
@@ -294,4 +317,5 @@ class homeClass():
 		
 
 home = homeClass()
+
 

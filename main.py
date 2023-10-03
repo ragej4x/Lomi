@@ -13,7 +13,7 @@ pg.display.set_caption("LOOOOOMIIIIIIIIIIIIKOOOOOO")
 #MODES
 home = False
 freeRoam = False
-editMode = True 
+editMode = True
 def showFps():
 	font = pg.font.SysFont("Arial", 18)
 	getFps = str(int(clock.get_fps()))
@@ -29,7 +29,7 @@ def eventHandler():
 	dynamicResolution = pg.transform.scale(display, (width, height))
 	#//
 	if editMode == False:
-		window.blit(dynamicpResolution, (0,0))
+		window.blit(dynamicResolution, (0,0))
 
 	#RENDER TXT INTO WINDOW
 	showFps()
@@ -41,7 +41,7 @@ def renderIn_noDynamicScale():
 	#NO DYNAMIC RES BLIT IN MAIN
 	if editMode == True:
 		editor.main.update(pg, mx,my,mouseinput,keyinput,window)
-		editor.main.draw_tile(pg, window)
+		editor.main.draw_tile(pg, window, keyinput)
 		editor.main.draw_grid(pg, window)
 
 
@@ -72,7 +72,7 @@ def freeRoamFunc():
 	main.lomi.updateAnimation(display, keyinput, pg)
 
 
-	main.Map.update(display, pg)
+	main.Map.update(display, pg,keyinput)
 
 
 	#move
