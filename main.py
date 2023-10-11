@@ -40,9 +40,10 @@ def renderIn_noDynamicScale():
 
 	#NO DYNAMIC RES BLIT IN MAIN
 	if editMode == True:
-		editor.main.update(mx,my,mouseinput,keyinput,window)
-		editor.main.draw_tile(window, keyinput, mx , my, mouseinput)
-		editor.main.draw_grid(window)
+		editor.main.draw_tile(pg, window, keyinput, mx , my, mouseinput)
+		editor.main.update(pg, mx,my,mouseinput,keyinput,window)
+		editor.main.draw_grid(pg, window)
+
 
 
 def homeFunc():
@@ -58,7 +59,7 @@ def homeFunc():
 	main.lomi.updateAnimation(display, keyinput, pg)
 
 	#move
-	main.lomi.x += main.lomi.xVel
+	main.lomi.x += main.lomi.xVelx
 	main.lomi.y += main.lomi.yVel
 
 def freeRoamFunc():
