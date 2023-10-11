@@ -4,18 +4,24 @@ class editor_class():
 	def __init__(self):
 		import pygame as pg
 		self.world_data = []
-		self.max_col = 50
-		self.rows = 40
+		self.max_col = 53
+		self.rows = 23
 		self.height = 900
 		self.width = 620
-		self.tile_size = self.height // self.rows
-		self.tile = 1
+		self.tile_size = self.height // self.rows - 8
+		self.tile = 0
 
+		self.button_columns = 9
+		self.button_rows = 7
+		self.button_width = 16
+		self.button_hight = 16
+		self.buttons = []
 
 		#LOAD IMAGE
 		self.item_list = []
-		self.item_count = 63
-		for i in range(self.item_count):
+		self.item_count = 64
+	
+		for i in range(1, self.item_count + 1):
 			self.small_items = pg.image.load(f"data/assets/items/item ({i}).png")
 			self.small_items = pg.transform.scale(self.small_items, (self.tile_size, self.tile_size))
 			self.item_list.append(self.small_items)
@@ -27,17 +33,35 @@ class editor_class():
 			r = [0] * self.max_col
 			self.world_data.append(r)
 
-		print(self.world_data)
+		#print(self.world_data)
 
 
-	def draw_tile(self, pg, display, keyinput):
-		if keyinput[pg.K_UP]:
-			self.item_count	= self.item_count + 1
-			self.tile	= self.tile + 1
-		if keyinput[pg.K_DOWN]:
-			self.item_count = self.item_count - 1
-			self.tile = self.tile - 1
+	def draw_tile(self, pg, display, keyinput, mx , my, mouseinput):
+		#def draw_button(vx, vy, width, height, text):
+			#button_rect = pg.draw.rect(display, (255,255,255), (vx, vy, width, height), 2)
 
+
+		#draw tilesets
+		#if keyinput[pg.K_RIGHT]:
+		if mouseinput[0]:
+			for button in self.buttons:
+				if button["rect"].collidepoint(mx , my):
+					self.tile = button['item']
+
+		for button in self.buttons:
+
+			#print(button["item"])
+			display.blit(self.item_list[button["item"]], (button["posx"], button["posy"]))
+
+
+		for row in range(self.button_rows):
+			for col in range(self.button_columns):
+				x = col * (self.tile_size) + 20 * self.tile_size
+				y = row * (self.tile_size)
+				text = f"Button {row * self.button_columns + col + 1}"
+
+				#draw_button(x , y , self.tile_size, self.tile_size, text)
+				self.buttons.append({"rect": pg.Rect(x, y, self.tile_size, self.tile_size), "text":text, "item":row * self.button_columns + col + 1, "posx":x, "posy":y} )
 
 		for y, row in enumerate(self.world_data):
 			for x, tile in enumerate(row):
@@ -65,17 +89,17 @@ class editor_class():
 			if mouseinput[0]:
 				if self.world_data[y][x] != self.tile:
 					self.world_data[y][x] = self.tile
-					print(self.world_data[y][x])
+					#print(self.world_data[y][x])
 			if mouseinput[2]:
 				self.world_data[y][x] = 0
 
 
 		#SAVE DATA
-		print(x,y)
+		#print(x,y)
 
 		if keyinput[pg.K_p]:
-			print("SAVED")
-			print(self.world_data)
+			#print("SAVED")
+			#print(self.world_data)
 			with open("data/assets/map_1.data", "w", newline="") as file:
 				writer = csv.writer(file, delimiter = ",")
 				for row in self.world_data:
@@ -89,5 +113,9 @@ class editor_class():
 				for x, row in enumerate(reader):
 					for y, tile in enumerate(row):
 						self.world_data[x][y] = int(tile)
+
+
+
+
 
 main = editor_class()

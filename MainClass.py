@@ -11,7 +11,7 @@ class MainClass():
 		self.down = False
 		self.up = False
 
-		self.speed = 2
+		self.speed = 1
 
 		self.red = (255,0,0)
 		self.green = (0,255,0)
@@ -20,13 +20,15 @@ class MainClass():
 
 		#CAMERA
 
-		self.cameraSpeed = 1.5
+		self.cameraSpeed = 1
 		self.cameraX = self.x - 125
 		self.cameraY = self.y - 110
 
 	def player(self, display, pg):
 		self.lomiRect = pg.Rect(self.x - self.cameraX , self.y - self.cameraY, 16,16)
+		self.lomiObjRect = pg.Rect(self.x - self.cameraX + 3, self.y - self.cameraY + 14, 9,2)
 		pg.draw.rect(display, self.red, self.lomiRect, 1)
+		pg.draw.rect(display, self.blue, self.lomiObjRect, 1)
 		#pg.draw.rect(display, (255,255,255), (30,30,30,30))
 	
 	def movement(self, keyinput, pg):
@@ -69,19 +71,19 @@ class MainClass():
 			self.xVel += self.speed
 
 		elif keyinput[pg.K_w] and keyinput[pg.K_d]:
-			self.speed = 1.5
+			self.speed = 0.5
 
 		elif keyinput[pg.K_a] and keyinput[pg.K_s]:
-			self.speed = 1.5
+			self.speed = 0.5
 
 		elif keyinput[pg.K_w] and keyinput[pg.K_a]:
-			self.speed = 1.5
+			self.speed = 0.5
 
 		elif keyinput[pg.K_s] and keyinput[pg.K_d]:
-			self.speed = 1.5
+			self.speed = 0.5
 
 		else:
-			self.speed = 2
+			self.speed = 1
 
 
 		#print(self.yVel, self.xVel)
@@ -133,7 +135,7 @@ class MapClass():
 
 
 		self.world_data = []
-		self.max_col = 50
+		self.max_col = 100
 		self.rows = 40
 		self.height = 900
 		self.width = 620
@@ -142,17 +144,12 @@ class MapClass():
 
 
 		#LOAD IMAGE
-		self.item_list = []
-		self.item_count = 63
-		for i in range(self.item_count):
-			self.small_items = pg.image.load(f"data/assets/items/item ({i}).png")
-			#self.small_items = pg.transform.scale(self.small_items, (self.tile_size, self.tile_size))
-			self.item_list.append(self.small_items)
 
 
 		for row in range(self.rows):
 			r = [0] * self.max_col
 			self.world_data.append(r)
+
 
 
 		#LOAD DATA
@@ -161,9 +158,19 @@ class MapClass():
 			for x, row in enumerate(reader):
 				for y, tile in enumerate(row):
 					self.world_data[x][y] = int(tile)
+
+
+
+		#load map
+		self.layer_0 = pg.image.load("data/assets/map/layer_0.png")
+		self.layer_1 = pg.image.load("data/assets/map/layer_1.png")
+
 	
 
 	def update(self, display, pg, keyinput):
+
+
+
 
 		self.show_rect = True
 
@@ -172,26 +179,30 @@ class MapClass():
 
 		for y, row in enumerate(self.world_data):
 			for x, tile in enumerate(row):
-				if tile >= 1:
-					display.blit(self.item_list[tile], (x * 16 - lomi.cameraX, y * 16 - lomi.cameraY))
-					#display.blit(self.small_items_surface, (x * self.tile_size	,y * self.tile_size))
 
-
-				if tile == 1:
+				if tile == -1:
 					if self.show_rect == True:
 						self.block = pg.Rect((x * 16 - lomi.cameraX , y * 16 - lomi.cameraY, 16, 16))
 						pg.draw.rect(display, (255,255,255), self.block,1)
 					
 					#COLLISION
-					if self.block.colliderect(lomi.lomiRect.x + lomi.xVel , lomi.lomiRect.y, lomi.lomiRect.width, lomi.lomiRect.height):
+					if self.block.colliderect(lomi.lomiObjRect.x + lomi.xVel , lomi.lomiObjRect.y, lomi.lomiObjRect.width, lomi.lomiObjRect.height):
 						lomi.xVel = 0
 
 
-					if self.block.colliderect(lomi.lomiRect.x + lomi.xVel , lomi.lomiRect.y, lomi.lomiRect.width , lomi.lomiRect.height):
+					if self.block.colliderect(lomi.lomiObjRect.x + lomi.xVel , lomi.lomiObjRect.y, lomi.lomiObjRect.width , lomi.lomiObjRect.height):
 						lomi.xVel = 0
 
-					if self.block.colliderect(lomi.lomiRect.x, lomi.lomiRect.y + lomi.yVel, lomi.lomiRect.width , lomi.lomiRect.height):
+					if self.block.colliderect(lomi.lomiObjRect.x, lomi.lomiObjRect.y + lomi.yVel, lomi.lomiObjRect.width , lomi.lomiObjRect.height):
 						lomi.yVel = 0
+	
+
+	def update_layer_0(self, display):
+		display.blit(self.layer_0, (0 - lomi.cameraX, 0 - lomi.cameraY))
+
+
+	def update_layer_1(self, display):
+		display.blit(self.layer_1, (0 - lomi.cameraX, 0 - lomi.cameraY))
 
 
 class AnimationClass():
@@ -199,7 +210,7 @@ class AnimationClass():
 		self.x = x
 		self.y = y
 
-		self.frameSpeed = 0.1
+		self.frameSpeed = 0.15
 
 		self.idleDownFrame = 1
 		self.idleUpFrame = 1
@@ -292,7 +303,7 @@ class AnimationClass():
 			self.runRightFrame = 1
 
 
-lomi = MainClass(0,0)
+lomi = MainClass(80,80)
 Map = MapClass()
 anim = AnimationClass(lomi.x, lomi.y)
 
