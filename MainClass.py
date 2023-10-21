@@ -6,7 +6,7 @@ class MainClass():
 		self.x = x
 		self.y = y
 
-		self.left = False
+		self.left = True
 		self.right = False
 		self.down = False
 		self.up = False
@@ -18,9 +18,13 @@ class MainClass():
 		self.blue = (0,0,255)
 
 
+		self.fix_speed = 0.8
+
+
+
 		#CAMERA
 
-		self.cameraSpeed = 1
+		self.cameraSpeed = 0.8
 		self.cameraX = self.x - 125
 		self.cameraY = self.y - 110
 
@@ -64,23 +68,24 @@ class MainClass():
 			self.up = False
 			self.down = False
 
-		#FIX
+			#FIX
+
 
 		if keyinput[pg.K_a] and keyinput[pg.K_d]:
 			self.right = True
 			self.xVel += self.speed
 
 		elif keyinput[pg.K_w] and keyinput[pg.K_d]:
-			self.speed = 0.5
+			self.speed = self.fix_speed
 
 		elif keyinput[pg.K_a] and keyinput[pg.K_s]:
-			self.speed = 0.5
+			self.speed = self.fix_speed
 
 		elif keyinput[pg.K_w] and keyinput[pg.K_a]:
-			self.speed = 0.5
+			self.speed = self.fix_speed
 
 		elif keyinput[pg.K_s] and keyinput[pg.K_d]:
-			self.speed = 0.5
+			self.speed = self.fix_speed
 
 		else:
 			self.speed = 1
@@ -135,6 +140,8 @@ class MapClass():
 
 
 		self.world_data = []
+		self.world_data_layer_2 = []
+		self.world_coll_data = []
 		self.max_col = 100
 		self.rows = 40
 		self.height = 900
@@ -143,6 +150,9 @@ class MapClass():
 		self.tile = 1
 
 
+		self.tile_list = []
+		self.tile_count = 215
+
 		#LOAD IMAGE
 
 
@@ -150,22 +160,44 @@ class MapClass():
 			r = [0] * self.max_col
 			self.world_data.append(r)
 
+		for row in range(self.rows):
+			r = [0] * self.max_col
+			self.world_data_layer_2.append(r)
 
+		for row in range(self.rows):
+			r = [0] * self.max_col
+			self.world_coll_data.append(r)
 
 		#LOAD DATA
-		with open("data/assets/map_1.data", newline='') as data:
+		with open("map_layer_1.data", newline='') as data:
 			reader = csv.reader(data, delimiter = ",")
 			for x, row in enumerate(reader):
 				for y, tile in enumerate(row):
 					self.world_data[x][y] = int(tile)
 
 
+		with open("map_layer_2.data", newline='') as data:
+			reader = csv.reader(data, delimiter = ",")
+			for x, row in enumerate(reader):
+				for y, tile in enumerate(row):
+					self.world_data_layer_2[x][y] = int(tile)
+        
+
+		with open("map_coll.data", newline='') as data:
+			reader = csv.reader(data, delimiter = ",")
+			for x, row in enumerate(reader):
+				for y, tile in enumerate(row):
+					self.world_coll_data[x][y] = int(tile)
 
 		#load map
 		self.layer_0 = pg.image.load("data/assets/map/layer_0.png")
 		self.layer_1 = pg.image.load("data/assets/map/layer_1.png")
 
-	
+
+		for i in range(self.tile_count):
+			self.tile = pg.image.load(f"data/assets/street_tiles/tile ({i}).png")
+			#self.tile = pg.transform.scale(self.tile, (self.tile_size, self.tile_size))
+			self.tile_list.append(self.tile)
 
 	def update(self, display, pg, keyinput):
 
@@ -177,12 +209,12 @@ class MapClass():
 
 		#self.plat = pg.Surface(())
 
-		for y, row in enumerate(self.world_data):
+		for y, row in enumerate(self.world_coll_data):
 			for x, tile in enumerate(row):
 
 				if tile == -1:
 					if self.show_rect == True:
-						self.block = pg.Rect((x * 16 - lomi.cameraX , y * 16 - lomi.cameraY, 16, 16))
+						self.block = pg.Rect((x * 16 - lomi.cameraX -16 , y * 16 - lomi.cameraY, 16, 16))
 						pg.draw.rect(display, (255,255,255), self.block,1)
 					
 					#COLLISION
@@ -195,14 +227,26 @@ class MapClass():
 
 					if self.block.colliderect(lomi.lomiObjRect.x, lomi.lomiObjRect.y + lomi.yVel, lomi.lomiObjRect.width , lomi.lomiObjRect.height):
 						lomi.yVel = 0
-	
 
-	def update_layer_0(self, display):
-		display.blit(self.layer_0, (0 - lomi.cameraX, 0 - lomi.cameraY))
+	def update_layer_1(self, display, pg):
+		#display.blit(self.layer_1, (0 - lomi.cameraX, 0 - lomi.cameraY))
+
+		for y, row in enumerate(self.world_data):
+			for x, tile in enumerate(row):
+				if tile >= 1:
+					display.blit(self.tile_list[tile], (x * 16 - lomi.cameraX , y * 16 - lomi.cameraY))
+                #display.blit(self.small_items_surface, (x * self.tile_size ,y * self.tile_size))
 
 
-	def update_layer_1(self, display):
-		display.blit(self.layer_1, (0 - lomi.cameraX, 0 - lomi.cameraY))
+
+	def update_layer_2(self, display, pg):
+		#display.blit(self.layer_1, (0 - lomi.cameraX, 0 - lomi.cameraY))
+
+		for y, row in enumerate(self.world_data_layer_2):
+			for x, tile in enumerate(row):
+				if tile >= 1:
+					display.blit(self.tile_list[tile], (x * 16 - lomi.cameraX , y * 16 - lomi.cameraY))
+                #display.blit(self.small_items_surface, (x * self.tile_size ,y * self.tile_size))
 
 
 class AnimationClass():
